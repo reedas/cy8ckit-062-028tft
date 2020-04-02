@@ -1,37 +1,36 @@
 /******************************************************************************
+* 
 * File Name: oledTask.c
 *
-* Version: 1.0
-*
 *******************************************************************************
-* Copyright (2019), Cypress Semiconductor Corporation. All rights reserved.
+* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
 *******************************************************************************
 * This software, including source code, documentation and related materials
-* (“Software”), is owned by Cypress Semiconductor Corporation or one of its
-* subsidiaries (“Cypress”) and is protected by and subject to worldwide patent
+* ("Software"), is owned by Cypress Semiconductor Corporation or one of its
+* subsidiaries ("Cypress") and is protected by and subject to worldwide patent
 * protection (United States and foreign), United States copyright laws and
 * international treaty provisions. Therefore, you may use this Software only
 * as provided in the license agreement accompanying the software package from
-* which you obtained this Software (“EULA”).
+* which you obtained this Software ("EULA").
 *
-* If no EULA applies, Cypress hereby grants you a personal, nonexclusive,
+* If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software source
-* code solely for use in connection with Cypress’s integrated circuit products.
+* code solely for use in connection with Cypress's integrated circuit products.
 * Any reproduction, modification, translation, compilation, or representation
 * of this Software except as specified above is prohibited without the express
 * written permission of Cypress.
 *
-* Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, 
-* EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED 
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Cypress 
-* reserves the right to make changes to the Software without notice. Cypress 
-* does not assume any liability arising out of the application or use of the 
-* Software or any product or circuit described in the Software. Cypress does 
-* not authorize its products for use in any products where a malfunction or 
-* failure of the Cypress product may reasonably be expected to result in 
-* significant property damage, injury or death (“High Risk Product”). By 
-* including Cypress’s product in a High Risk Product, the manufacturer of such 
-* system or application assumes all risk of such use and in doing so agrees to 
+* Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Cypress
+* reserves the right to make changes to the Software without notice. Cypress
+* does not assume any liability arising out of the application or use of the
+* Software or any product or circuit described in the Software. Cypress does
+* not authorize its products for use in any products where a malfunction or
+* failure of the Cypress product may reasonably be expected to result in
+* significant property damage, injury or death ("High Risk Product"). By
+* including Cypress's product in a High Risk Product, the manufacturer of such
+* system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
 /******************************************************************************
@@ -42,12 +41,12 @@
 * scrolls through the following display pages that demonstrate various features
 * of emWin library.
 *
-*	1. A screen showing a text box with wrapped text
+*   1. A screen showing a text box with wrapped text
 *   2. A screen showing normal fonts
-*	3. A screen showing bold fonts
+*   3. A screen showing bold fonts
 *   4. A screen showing various text alignments, styles and modes
-*	5. A screen showing 2D graphics with vertical lines of various thickness
-*		rounded rectangles and circles
+*   5. A screen showing 2D graphics with vertical lines of various thickness
+*       rounded rectangles and circles
 *
  *******************************************************************************/
 
@@ -454,8 +453,8 @@ void Show2DGraphics(void)
 ********************************************************************************
 *
 * Summary: This implements a simple "Wait for button press and release"
-*			function.  It first waits for the button to be pressed and then
-*			waits for the button to be released.
+*           function.  It first waits for the button to be pressed and then
+*           waits for the button to be released.
 *
 * Parameters:
 *  None
@@ -470,10 +469,10 @@ void Show2DGraphics(void)
 void WaitforSwitchPressAndRelease(void)
 {
     /* Wait for SW2 to be pressed */
-    while( CYBSP_BTN_PRESSED != cyhal_gpio_read((cyhal_gpio_t)CYBSP_SW2));
+    while( CYBSP_BTN_PRESSED != cyhal_gpio_read(CYBSP_USER_BTN));
 
     /* Wait for SW2 to be released */
-    while( CYBSP_BTN_PRESSED == cyhal_gpio_read((cyhal_gpio_t)CYBSP_SW2));
+    while( CYBSP_BTN_PRESSED == cyhal_gpio_read(CYBSP_USER_BTN));
 }
 
 /*******************************************************************************
@@ -510,7 +509,7 @@ void oledTask(void *arg)
     GUI_Init();
 
     /* Configure Switch and LEDs*/
-    cyhal_gpio_init((cyhal_gpio_t)CYBSP_SW2, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
+    cyhal_gpio_init( CYBSP_USER_BTN, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
 
     /* Display startup screen for 2 seconds */
     ShowStartupScreen();
@@ -522,13 +521,13 @@ void oledTask(void *arg)
 
     for (;;)
     {
-		/* Wait for a switch press event */
-		WaitforSwitchPressAndRelease();
+        /* Wait for a switch press event */
+        WaitforSwitchPressAndRelease();
 
-		/* Using pageNumber as index, update the display with a demo screen */
-		(*demoPageArray[pageNumber])();
+        /* Using pageNumber as index, update the display with a demo screen */
+        (*demoPageArray[pageNumber])();
 
-		/* Cycle through page numbers */
-		pageNumber = (pageNumber + 1) % NUMBER_OF_DEMO_PAGES;
+        /* Cycle through page numbers */
+        pageNumber = (pageNumber + 1) % NUMBER_OF_DEMO_PAGES;
     }
 }
