@@ -1,9 +1,9 @@
 /******************************************************************************
-* File Name: i2c_portapi.h
 *
-* Description: This is the header file for i2c_portapi.h
+* File Name: images.h
 *
-* Hardware Dependency: CY8CKIT-032 AFE Shield
+* Description: This file contains the global references of the EmWin bitmap
+* images being used.
 *
 *******************************************************************************
 * (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
@@ -36,21 +36,10 @@
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
+#ifndef SOURCE_IMAGES_H_
+#define SOURCE_IMAGES_H_
 
-#ifndef __I2C_H
-#define __I2C_H
+/* External global references */
+extern GUI_CONST_STORAGE GUI_BITMAP bmCypress_Logo_1_BPP_Inv;
 
-
-/*********************************************************************
-*
-*       Public routines
-*/
-void          I2C_Init(void);
-void          I2C_WriteCommandByte(unsigned char c);
-void          I2C_WriteDataByte(unsigned char c);
-void          I2C_WriteDataStream(unsigned char * pData, int NumBytes);
-void          I2C_ReadDataStream(unsigned char * pData, int NumBytes);
-
-#endif /* __I2C_H */
-
-/*************************** End of file ****************************/
+#endif /* SOURCE_IMAGES_H_ */

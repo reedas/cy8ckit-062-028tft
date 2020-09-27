@@ -46,12 +46,23 @@
 #include "oledTask.h"
 
 /*******************************************************************************
+* Macros
+*******************************************************************************/
+#define OLED_TASK_STACK_SIZE        (1024*10)
+#define OLED_TASK_PRIORITY          (configMAX_PRIORITIES - 3)
+
+/*******************************************************************************
+* Global Variables
+*******************************************************************************/
+/* This enables RTOS aware debugging. */
+volatile int uxTopUsedPriority;
+
+/*******************************************************************************
 * Function Name: main
 ********************************************************************************
 * Summary:
-* This is the main function for CM4 CPU.
-*   1) Create task for OLED
-*   2) Schedule the task
+*  System entrance point. This function sets up the OLED task and starts
+*  the RTOS scheduler.
 *
 * Parameters:
 *  void
@@ -64,18 +75,20 @@ int main(void)
 {
     cy_rslt_t result;
 
-    /* Initialize the device and board peripherals */
-    result = cybsp_init();
-    if(result != CY_RSLT_SUCCESS)
-    {
-        CY_ASSERT(0);
-    }
+    /* This enables RTOS aware debugging in OpenOCD */
+    uxTopUsedPriority = configMAX_PRIORITIES - 1 ;
 
-    result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);
-    if(result != CY_RSLT_SUCCESS)
-    {
-    	CY_ASSERT(0);
-    }
+    /* Initialize the board support package */
+    result = cybsp_init() ;
+    CY_ASSERT(result == CY_RSLT_SUCCESS);
+
+    /* Initialize retarget-io to use the debug UART port */
+    result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX,
+                                 CY_RETARGET_IO_BAUDRATE);
+    CY_ASSERT(result == CY_RSLT_SUCCESS);
+
+    /* To avoid compiler warning */
+    (void)result;
 
     /* \x1b[2J\x1b[;H - ANSI ESC sequence for clear screen */
     printf("\x1b[2J\x1b[;H");
@@ -84,7 +97,13 @@ int main(void)
     printf("PSoC 6 MCU emWin OLED\r\n");
     printf("**********************************************************\r\n");
 
-    xTaskCreate( oledTask, "OLED Task", 1024*10,  0,  1,  0);
+    /* Create the OLED task */
+    xTaskCreate( oledTask, "OLED Task", OLED_TASK_STACK_SIZE,  NULL,
+                 OLED_TASK_PRIORITY,  NULL);
+
+    /* Start the FreeRTOS scheduler. */
     vTaskStartScheduler();
-    while(1);// Will never get here
+
+    /* Should never get here. */
+    CY_ASSERT(0);
 }

@@ -49,17 +49,32 @@
 *       rounded rectangles and circles
 *
  *******************************************************************************/
-
 #include "cy_pdl.h"
 #include "cyhal.h"
 #include "cybsp.h"
 #include "GUI.h"
+#include "mtb_ssd1306.h"
+#include "mtb_ssd1306_i2c.h"
+#include "cy8ckit_032.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "images.h"
 
-/* External global references */
-extern GUI_CONST_STORAGE GUI_BITMAP bmCypress_Logo_1_BPP_Inv;
+/*******************************************************************************
+* Macros
+*******************************************************************************/
+/* I2C bus speed */
+#define I2C_SPEED                           (400000)
 
+/* Number of demo pages */
+#define NUMBER_OF_DEMO_PAGES    (sizeof(demoPageArray)/sizeof(demoPageArray[0]))
+
+/* Delay after startup screen in milliseconds */
+#define DELAY_AFTER_STARTUP_SCREEN_MS       (2000)
+
+/*******************************************************************************
+* Forward declaration
+*******************************************************************************/
 /* Function prototypes */
 void ShowFontSizesNormal(void);
 void ShowFontSizesBold(void);
@@ -77,10 +92,6 @@ void (*demoPageArray[])(void) = {
     ShowTextStyles,
     Show2DGraphics
 };
-
-/* Number of demo pages */
-#define NUMBER_OF_DEMO_PAGES    (sizeof(demoPageArray)/sizeof(demoPageArray[0]))
-
 
 /*******************************************************************************
 * Function Name: void ShowStartupScreen(void)
@@ -504,17 +515,42 @@ void WaitforSwitchPressAndRelease(void)
 void oledTask(void *arg)
 {
     uint8_t pageNumber = 0;
+    cy_rslt_t result;
+    cyhal_i2c_t i2c_obj;
+
+    /* Configuration to initialize the I2C block */
+    cyhal_i2c_cfg_t i2c_config = {
+        .is_slave = false,
+        .address = OLED_I2C_ADDRESS,
+        .frequencyhal_hz = I2C_SPEED
+    };
+
+    /* Initialize and configure the I2C to use with the OLED display */
+    result = cyhal_i2c_init( &i2c_obj, CY8CKIT_032_PIN_I2C_SDA,
+                             CY8CKIT_032_PIN_I2C_SCL, NULL);
+    CY_ASSERT(result == CY_RSLT_SUCCESS);
+
+    result = cyhal_i2c_configure(&i2c_obj, &i2c_config);
+    CY_ASSERT(result == CY_RSLT_SUCCESS);
+
+    /* Initialize the OLED display */
+    result = mtb_ssd1306_init_i2c(&i2c_obj);
+    CY_ASSERT(result == CY_RSLT_SUCCESS);
+
+    /* To avoid compiler warning */
+    (void)result;
 
     /* Initialize emWin GUI */
     GUI_Init();
 
     /* Configure Switch and LEDs*/
-    cyhal_gpio_init( CYBSP_USER_BTN, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
+    cyhal_gpio_init( CYBSP_USER_BTN, CYHAL_GPIO_DIR_INPUT,
+                     CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
 
     /* Display startup screen for 2 seconds */
     ShowStartupScreen();
 
-    vTaskDelay(2000);
+    vTaskDelay(DELAY_AFTER_STARTUP_SCREEN_MS);
 
     /* Show the instructions screen */
     ShowInstructionsScreen();
