@@ -34,7 +34,7 @@
 # configurations. If TARGET is manually edited, ensure TARGET_<BSP>.mtb with a 
 # valid URL exists in the application, run 'make getlibs' to fetch BSP contents
 # and update or regenerate launch configurations for your IDE.
-TARGET=CY8CKIT-062-BLE
+TARGET=CY8CKIT-062-WIFI-BT
 
 # Name of application (used to derive name of final linked file).
 # 
@@ -79,7 +79,7 @@ VERBOSE=
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS=EMWIN_OSNTS FREERTOS
+COMPONENTS=EMWIN_OSTS FREERTOS
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 DISABLE_COMPONENTS=

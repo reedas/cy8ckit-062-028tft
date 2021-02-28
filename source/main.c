@@ -3,8 +3,9 @@
 *
 * Related Document: See Readme.md
 *
-* Description: This code example demonstrates displaying graphics on an OLED
+* Description: This code example demonstrates displaying graphics on a TFT
 * display using EmWin graphics library.
+* hacked from OLED version by reedas
 *
 *******************************************************************************
 * (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
@@ -43,13 +44,14 @@
 #include "cy_retarget_io.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "oledTask.h"
+#include "display_task.h"
+
 
 /*******************************************************************************
 * Macros
 *******************************************************************************/
-#define OLED_TASK_STACK_SIZE        (1024*10)
-#define OLED_TASK_PRIORITY          (configMAX_PRIORITIES - 3)
+#define TFT_TASK_STACK_SIZE         (1024*10)
+#define TFT_TASK_PRIORITY           (configMAX_PRIORITIES - 3)
 
 /*******************************************************************************
 * Global Variables
@@ -92,14 +94,13 @@ int main(void)
 
     /* \x1b[2J\x1b[;H - ANSI ESC sequence for clear screen */
     printf("\x1b[2J\x1b[;H");
-
     printf("**********************************************************\r\n");
-    printf("PSoC 6 MCU emWin OLED\r\n");
+    printf("PSoC 6 MCU emWin TFT\r\n");
     printf("**********************************************************\r\n");
 
-    /* Create the OLED task */
-    xTaskCreate( oledTask, "OLED Task", OLED_TASK_STACK_SIZE,  NULL,
-                 OLED_TASK_PRIORITY,  NULL);
+    /* Create the TFT display task */
+    xTaskCreate( tftTask, "TFT Task", TFT_TASK_STACK_SIZE,  NULL,
+                 TFT_TASK_PRIORITY,  NULL);
 
     /* Start the FreeRTOS scheduler. */
     vTaskStartScheduler();
